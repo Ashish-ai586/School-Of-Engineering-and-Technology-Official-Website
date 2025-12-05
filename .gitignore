@@ -47,5 +47,8 @@ Thumbs.db
 dist/
 build/
 
+# GitHub Actions
+.github/workflows/_site/
+
 # Cache
 .cache/

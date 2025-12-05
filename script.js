@@ -1,32 +1,129 @@
-// JavaScript for SOET Website Functionality
+/* ========================================
+   SoET Website - Main JavaScript
+   School of Engineering and Technology
+   Vikram University, Ujjain
+   
+   Professional, modular, and well-documented code
+   Handles navigation, animations, forms, and interactions
+   ======================================== */
 
+/**
+ * ========================================
+ * INITIALIZATION
+ * Main entry point when DOM is fully loaded
+ * ========================================
+ */
 document.addEventListener('DOMContentLoaded', function() {
-    // Mobile Menu Toggle
+    // Initialize all modules
+    initializeMobileNavigation();
+    initializeSmoothScrolling();
+    initializeTabFunctionality();
+    initializeHeaderEffects();
+    initializeScrollAnimations();
+    initializeStatCounters();
+    initializeFormHandling();
+    initializeUtilityFeatures();
+    
+    console.log('✅ SoET Website initialized successfully!');
+});
+
+/**
+ * ========================================
+ * MOBILE NAVIGATION MODULE
+ * Handles responsive mobile menu functionality
+ * ========================================
+ */
+function initializeMobileNavigation() {
     const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
     const nav = document.querySelector('.nav ul');
     
-    if (mobileMenuToggle) {
-        mobileMenuToggle.addEventListener('click', function() {
-            nav.style.display = nav.style.display === 'flex' ? 'none' : 'flex';
-            nav.style.flexDirection = 'column';
-            nav.style.position = 'absolute';
-            nav.style.top = '100%';
-            nav.style.left = '0';
-            nav.style.right = '0';
-            nav.style.backgroundColor = 'white';
-            nav.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
-            nav.style.padding = '20px';
-            nav.style.zIndex = '1001';
-        });
-    }
+    if (!mobileMenuToggle || !nav) return;
+    
+    // Toggle mobile menu on button click
+    mobileMenuToggle.addEventListener('click', function() {
+        toggleMobileMenu(this, nav);
+    });
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', function(event) {
+        if (!mobileMenuToggle.contains(event.target) && !nav.contains(event.target)) {
+            closeMobileMenu(mobileMenuToggle, nav);
+        }
+    });
+    
+    // Handle keyboard navigation
+    mobileMenuToggle.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            this.click();
+        }
+    });
+}
 
-    // Smooth scrolling for navigation links
+/**
+ * Toggle mobile menu state
+ * @param {HTMLElement} toggle - Menu toggle button
+ * @param {HTMLElement} nav - Navigation menu
+ */
+function toggleMobileMenu(toggle, nav) {
+    const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', !isExpanded);
+    
+    if (nav.style.display === 'flex') {
+        closeMobileMenu(toggle, nav);
+    } else {
+        openMobileMenu(toggle, nav);
+    }
+}
+
+/**
+ * Open mobile menu with proper styling
+ * @param {HTMLElement} toggle - Menu toggle button
+ * @param {HTMLElement} nav - Navigation menu
+ */
+function openMobileMenu(toggle, nav) {
+    nav.style.display = 'flex';
+    nav.style.flexDirection = 'column';
+    nav.style.position = 'absolute';
+    nav.style.top = '100%';
+    nav.style.left = '0';
+    nav.style.right = '0';
+    nav.style.backgroundColor = 'white';
+    nav.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+    nav.style.padding = '20px';
+    nav.style.zIndex = '1001';
+    toggle.querySelector('i').classList.replace('fa-bars', 'fa-times');
+}
+
+/**
+ * Close mobile menu and reset styles
+ * @param {HTMLElement} toggle - Menu toggle button
+ * @param {HTMLElement} nav - Navigation menu
+ */
+function closeMobileMenu(toggle, nav) {
+    nav.style.display = 'none';
+    toggle.setAttribute('aria-expanded', 'false');
+    const icon = toggle.querySelector('i');
+    if (icon) {
+        icon.classList.replace('fa-times', 'fa-bars');
+    }
+}
+
+/**
+ * ========================================
+ * SMOOTH SCROLLING MODULE
+ * Enables smooth scrolling for anchor links
+ * ========================================
+ */
+function initializeSmoothScrolling() {
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
             const target = document.querySelector(this.getAttribute('href'));
+            
             if (target) {
-                const headerHeight = document.querySelector('.header').offsetHeight;
+                const header = document.querySelector('.header');
+                const headerHeight = header ? header.offsetHeight : 0;
                 const targetPosition = target.offsetTop - headerHeight;
                 
                 window.scrollTo({
@@ -36,43 +133,79 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+}
 
-    // Tab functionality for activities section
+/**
+ * ========================================
+ * TAB FUNCTIONALITY MODULE
+ * Handles tabbed content switching (activities page)
+ * ========================================
+ */
+function initializeTabFunctionality() {
     const tabButtons = document.querySelectorAll('.tab-btn');
     const tabPanes = document.querySelectorAll('.tab-pane');
+
+    if (tabButtons.length === 0) return;
 
     tabButtons.forEach(button => {
         button.addEventListener('click', function() {
             const targetTab = this.getAttribute('data-tab');
             
-            // Remove active class from all buttons and panes
+            // Remove active state from all tabs
             tabButtons.forEach(btn => btn.classList.remove('active'));
             tabPanes.forEach(pane => pane.classList.remove('active'));
             
-            // Add active class to clicked button and corresponding pane
+            // Activate selected tab
             this.classList.add('active');
-            document.getElementById(targetTab).classList.add('active');
+            const targetPane = document.getElementById(targetTab);
+            if (targetPane) {
+                targetPane.classList.add('active');
+            }
         });
     });
+}
 
-    // Header scroll effect
+/**
+ * ========================================
+ * HEADER EFFECTS MODULE
+ * Dynamic header styling based on scroll position
+ * ========================================
+ */
+function initializeHeaderEffects() {
     const header = document.querySelector('.header');
     let lastScrollTop = 0;
 
-    window.addEventListener('scroll', function() {
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        
-        if (scrollTop > 100) {
-            header.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
-            header.style.backdropFilter = 'blur(10px)';
-        } else {
-            header.style.backgroundColor = 'white';
-            header.style.backdropFilter = 'none';
-        }
-        
-        lastScrollTop = scrollTop;
-    });
+    if (!header) return;
 
+    window.addEventListener('scroll', function() {
+        try {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            // Add backdrop blur effect when scrolled
+            if (scrollTop > 100) {
+                header.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+                header.style.backdropFilter = 'blur(10px)';
+                header.style.webkitBackdropFilter = 'blur(10px)';
+            } else {
+                header.style.backgroundColor = 'white';
+                header.style.backdropFilter = 'none';
+                header.style.webkitBackdropFilter = 'none';
+            }
+            
+            lastScrollTop = scrollTop;
+        } catch (error) {
+            console.warn('Header scroll effect error:', error);
+        }
+    });
+}
+
+/**
+ * ========================================
+ * SCROLL ANIMATIONS MODULE
+ * Intersection Observer for fade-in animations
+ * ========================================
+ */
+function initializeScrollAnimations() {
     // Animate elements on scroll
     const observerOptions = {
         threshold: 0.1,
@@ -93,9 +226,24 @@ document.addEventListener('DOMContentLoaded', function() {
         el.classList.add('fade-in');
         observer.observe(el);
     });
+}
 
-    // Counter animation for statistics
+/**
+ * ========================================
+ * STATISTICS COUNTER MODULE
+ * Animated number counters for hero statistics
+ * ========================================
+ */
+function initializeStatCounters() {
+    /**
+     * Animate a counter from 0 to target value
+     * @param {HTMLElement} element - Element to animate
+     * @param {number} target - Target number
+     * @param {number} duration - Animation duration in ms
+     */
     function animateCounter(element, target, duration = 2000) {
+        if (!element || isNaN(target)) return;
+        
         let start = 0;
         const increment = target / (duration / 16);
         
@@ -134,66 +282,109 @@ document.addEventListener('DOMContentLoaded', function() {
                 heroObserver.unobserve(entry.target);
             }
         });
+    }, {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
     });
 
     const heroStats = document.querySelector('.hero-stats');
     if (heroStats) {
         heroObserver.observe(heroStats);
     }
+}
 
-    // Form handling
+/**
+ * ========================================
+ * FORM HANDLING MODULE
+ * Contact form validation and submission
+ * ========================================
+ */
+function initializeFormHandling() {
+    // Handle contact form submission
     const contactForm = document.querySelector('.contact-form form');
     if (contactForm) {
-        contactForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Get form data
-            const formData = new FormData(this);
-            const name = this.querySelector('input[type="text"]').value;
-            const email = this.querySelector('input[type="email"]').value;
-            const subject = this.querySelectorAll('input[type="text"]')[1].value;
-            const message = this.querySelector('textarea').value;
-            
-            // Basic validation
-            if (!name || !email || !subject || !message) {
-                alert('Please fill in all fields.');
-                return;
-            }
-            
-            if (!isValidEmail(email)) {
-                alert('Please enter a valid email address.');
-                return;
-            }
-            
-            // Simulate form submission
-            const submitBtn = this.querySelector('.btn-primary');
-            const originalText = submitBtn.textContent;
-            submitBtn.textContent = 'Sending...';
-            submitBtn.disabled = true;
-            
-            setTimeout(() => {
-                alert('Thank you for your message! We will get back to you soon.');
-                this.reset();
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-            }, 2000);
-        });
+        contactForm.addEventListener('submit', handleFormSubmit);
     }
+}
 
-    // Email validation function
-    function isValidEmail(email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
+/**
+ * Handle form submission with validation
+ * @param {Event} e - Form submit event
+ */
+function handleFormSubmit(e) {
+    e.preventDefault();
+    
+    // Extract form values
+    const name = this.querySelector('input[type="text"]').value;
+    const email = this.querySelector('input[type="email"]').value;
+    const subject = this.querySelectorAll('input[type="text"]')[1].value;
+    const message = this.querySelector('textarea').value;
+    
+    // Validate required fields
+    if (!name || !email || !subject || !message) {
+        alert('Please fill in all fields.');
+        return;
     }
+    
+    // Validate email format
+    if (!isValidEmail(email)) {
+        alert('Please enter a valid email address.');
+        return;
+    }
+    
+    // Simulate form submission with loading state
+    const submitBtn = this.querySelector('.btn-primary');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Sending...';
+    submitBtn.disabled = true;
+    
+    // Simulate API call
+    setTimeout(() => {
+        alert('Thank you for your message! We will get back to you soon.');
+        this.reset();
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    }, 2000);
+}
 
-    // Visitor counter simulation
-    function updateVisitorCount() {
+/**
+ * Validate email address format
+ * @param {string} email - Email address to validate
+ * @returns {boolean} True if valid email format
+ */
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+/**
+ * ========================================
+ * UTILITY FEATURES MODULE
+ * Visitor counter, parallax, and other utilities
+ * ========================================
+ */
+function initializeUtilityFeatures() {
+    updateVisitorCount();
+    initializeParallaxEffect();
+    initializeBackToTopButton();
+    initializeCardHoverEffects();
+    initializeSectionReveal();
+}
+
+/**
+ * Update visitor counter from localStorage
+ */
+function updateVisitorCount() {
+    try {
         const visitorCountElement = document.getElementById('visitor-count');
         if (visitorCountElement) {
             let count = localStorage.getItem('visitorCount') || 12345;
             count = parseInt(count) + Math.floor(Math.random() * 5) + 1;
             localStorage.setItem('visitorCount', count);
             visitorCountElement.textContent = count.toLocaleString();
+        }
+    } catch (error) {
+            console.warn('Error updating visitor count:', error);
         }
     }
 

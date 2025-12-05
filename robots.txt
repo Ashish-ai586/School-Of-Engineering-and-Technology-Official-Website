@@ -1,0 +1,19 @@
+# Robots.txt for SOET - Vikram University
+# Allows all web crawlers to access all content
+
+User-agent: *
+Allow: /
+
+# Block access to private directories if any
+Disallow: /private/
+Disallow: /admin/
+Disallow: /.git/
+
+# Allow crawling of images
+Allow: /IMG/
+
+# Rate limiting for bots
+Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://soet.vikramuniv.ac.in/sitemap.xml
